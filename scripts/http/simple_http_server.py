@@ -41,5 +41,5 @@ SocketServer.ThreadingTCPServer.allow_reuse_address = True
 
 httpd = SocketServer.TCPServer(("", PORT), Handler)
 
-print("Serving at: http://%s:%s" % ("localhost", PORT))
+print(f"Serving at: http://localhost:{PORT}")
 httpd.serve_forever()

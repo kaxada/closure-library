@@ -63,8 +63,7 @@ def _MatchFirstFunction(script):
 def _ParseArgString(arg_string):
   """Parse an argument string (inside parens) into parameter names."""
   for arg in arg_string.split(','):
-    arg = arg.strip()
-    if arg:
+    if arg := arg.strip():
       yield arg
 
 
@@ -76,8 +75,7 @@ def _ExtractFunctionBody(script, indentation=0):
   regex_str = r'{(.*?)^[ ]{%d}}' % indentation
 
   function_regex = re.compile(regex_str, re.MULTILINE | re.DOTALL)
-  match = function_regex.search(script)
-  if match:
+  if match := function_regex.search(script):
     return match.group(1)
 
 
@@ -91,7 +89,7 @@ def _ContainsReturnValue(function_body):
 
 def _InsertString(original_string, inserted_string, index):
   """Insert a string into another string at a given index."""
-  return original_string[0:index] + inserted_string + original_string[index:]
+  return original_string[:index] + inserted_string + original_string[index:]
 
 
 def _GenerateJsDoc(args, return_val=False):
@@ -105,9 +103,7 @@ def _GenerateJsDoc(args, return_val=False):
     The JSDoc as a string.
   """
 
-  lines = []
-  lines.append('/**')
-
+  lines = ['/**']
   lines += [' * @param {} %s' % arg for arg in args]
 
   if return_val:
@@ -150,8 +146,8 @@ def InsertJsDoc(script):
   lvalue_indentation = len(match.group('indentation'))
 
   return_val = False
-  function_body = _ExtractFunctionBody(function_to_end, lvalue_indentation)
-  if function_body:
+  if function_body := _ExtractFunctionBody(function_to_end,
+                                           lvalue_indentation):
     return_val = _ContainsReturnValue(function_body)
 
   jsdoc = _GenerateJsDoc(args, return_val)
@@ -163,9 +159,7 @@ def InsertJsDoc(script):
 
 if __name__ == '__main__':
   stdin_script = sys.stdin.read()
-  result = InsertJsDoc(stdin_script)
-
-  if result:
+  if result := InsertJsDoc(stdin_script):
     sys.stdout.write(result)
   else:
     sys.stdout.write(stdin_script)

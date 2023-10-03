@@ -72,11 +72,8 @@ class Source(object):
   @classmethod
   def _HasProvideGoogFlag(cls, source):
     """Determines whether the @provideGoog flag is in a comment."""
-    for comment_content in cls._COMMENT_REGEX.findall(source):
-      if '@provideGoog' in comment_content:
-        return True
-
-    return False
+    return any('@provideGoog' in comment_content
+               for comment_content in cls._COMMENT_REGEX.findall(source))
 
   def _ScanSource(self):
     """Fill in provides and requires by scanning the source."""
@@ -85,15 +82,12 @@ class Source(object):
 
     source_lines = stripped_source.splitlines()
     for line in source_lines:
-      match = _PROVIDE_REGEX.match(line)
-      if match:
+      if match := _PROVIDE_REGEX.match(line):
         self.provides.add(match.group(1))
-      match = _MODULE_REGEX.match(line)
-      if match:
+      if match := _MODULE_REGEX.match(line):
         self.provides.add(match.group(1))
         self.is_goog_module = True
-      match = _REQUIRES_REGEX.match(line)
-      if match:
+      if match := _REQUIRES_REGEX.match(line):
         self.requires.add(match.group(1))
 
     # Closure's base file implicitly provides 'goog'.
@@ -125,8 +119,8 @@ def GetFileContents(path):
     fileobj = codecs.open(path, encoding='utf-8-sig')
     return fileobj.read()
   except IOError as error:
-    raise IOError('An error occurred opening or reading the file: %s. %s'
-                  % (path, error))
+    raise IOError(
+        f'An error occurred opening or reading the file: {path}. {error}')
   finally:
     if fileobj is not None:
       fileobj.close()
